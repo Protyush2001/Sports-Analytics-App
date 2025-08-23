@@ -1,5 +1,6 @@
 import React from "react";
 import Body from "../components/Body";
+import ReviewCarousel from "../components/ReviewCarousel";
 
 
 
@@ -20,6 +21,10 @@ const Home = () => {
         </p>
       </header>
       <Body />
+      <div className="p-4 mt-8 bg-gray-100 flex items-center justify-center">
+        <ReviewCarousel />
+    </div>
+
 
 
     </div>

@@ -1,6 +1,24 @@
 import React from 'react'
+import { useEffect} from 'react'
+import { useNavigate } from 'react-router-dom';
 
 const Teams = () => {
+  const navigate = useNavigate();
+
+  // Get token and role from localStorage
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  useEffect(() => {
+    if (!token) {
+      alert("You need to log in first!");
+      navigate("/login");
+    } else if (!["player", "team_owner", "admin"].includes(role)) {
+      alert("Access denied! Only players, team owners, and admins can view this page.");
+      navigate("/");
+    }
+  }, [token, role, navigate]);
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       {/* Header Section */}

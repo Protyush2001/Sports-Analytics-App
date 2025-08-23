@@ -15,10 +15,18 @@ const customMatchSchema = new mongoose.Schema({
     runs: { type: Number, default: 0 },
     wickets: { type: Number, default: 0 },
     overs: { type: Number, default: 0 },
-    balls: { type: Number, default: 0 }
+    balls: { type: Number, default: 0 },
+    team: { type: Number, default: 0 }, // 0 or 1
+    innings: { type: Number, default: 1 }
+  },
+    stream: {
+    isLive: { type: Boolean, default: false },
+    roomId: { type: String, default: null },   // use match _id
+    startedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    startedAt: { type: Date, default: null },
   },
   status: { type: String, default: "Upcoming" }, // Live, Completed, etc.
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // admin / team owner
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // admin / team owner
   date: { type: Date, default: Date.now }
 }, { timestamps: true });
 

@@ -6,7 +6,9 @@ const mongoose = require('mongoose');
 const userRegisterSchemaValidation = Joi.object({
     username: Joi.string().min(3).max(30).required(),
     email: Joi.string().email().required(),
-    password: Joi.string().min(6).required()
+    password: Joi.string().min(6).required(),
+    role: Joi.string().valid("general_user", "player", "team_owner", "admin").default("user")
+    
 });
 const userLoginSchemaValidation = Joi.object({
     email: Joi.string().email().required(),
