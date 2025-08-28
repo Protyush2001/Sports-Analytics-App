@@ -42,7 +42,9 @@ const authenticateUser = (req, res, next) => {
 
     // Attach user ID to request object
     // req.userId = tokenData.userId;
-    req.user = { _id: tokenData.userId };
+    req.user = { _id: tokenData.userId,
+      role: tokenData.role
+ };
     next();
   } catch (err) {
     return res.status(401).json({ error: err.message });

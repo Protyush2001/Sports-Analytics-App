@@ -120,9 +120,12 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboard from "./pages/AdminDashboard";
+// import AuthProvider from "./context/AuthProvider";
 
 function App() {
   return (
+  
     <Router>
       <Navbar />
       <div className="container mx-auto p-4">
@@ -168,10 +171,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+                        {/* ✅ Admin route with role protection */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
         </Routes>
+
+
       </div>
       <Footer />
     </Router>
+
   );
 }
 

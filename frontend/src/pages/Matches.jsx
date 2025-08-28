@@ -970,6 +970,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import MatchCard from "../components/MatchCard";
   const tabs = ["Live", "Upcoming", "Completed"];
 const BASE_URL = "http://localhost:3026/api/matches";
 const Matches = () => {
@@ -992,25 +993,37 @@ const Matches = () => {
   const [currentInnings, setCurrentInnings] = useState(1);
 
   const [showForm, setShowForm] = useState(false);
-    const token = localStorage.getItem("token");
-  // const userId = JSON.parse(localStorage.getItem("userId"));
-  // const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId"); //changes made
+  const role = localStorage.getItem("role"); // changes made
 
   // Tabs state
    const [activeTab, setActiveTab] = useState("Live");
    const [matches, setMatches] = useState([]);
    const [loading, setLoading] = useState(false);
 
+     // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const matchesPerPage = 6; // Show 6 matches per page
+
+
 
   /** ✅ Streaming states */
   const [isStreaming, setIsStreaming] = useState(false);
   const localVideoRef = useRef(null);
   const peerConnection = useRef(null);
+
+    
+
+
  
    const fetchMatches = async (tab) => {
      setLoading(true);
      try {
-       const res = await axios.get(`${BASE_URL}?category=${tab.toLowerCase()}`);
+       const res = await axios.get(`${BASE_URL}?category=${tab.toLowerCase()}`,{
+        headers: { Authorization: `Bearer ${token}` },
+        params: { createdBy: userId }, // changes made
+      });
        setMatches(res.data.matches || []);
      } catch (err) {
        console.error("Failed to fetch:", err);
@@ -1022,8 +1035,8 @@ const Matches = () => {
  
    useEffect(() => {
      fetchMatches(activeTab);
-   }, [activeTab]);
- 
+   }, [activeTab, token, userId,role]); // changes made here
+
 
   // Create a new custom match
   const handleSubmit = async (e) => {
@@ -1057,6 +1070,7 @@ const Matches = () => {
       const res = await axios.post("http://localhost:3026/matches", matchData,  {
     headers: {
       Authorization: `Bearer ${token}`,
+      // params: { createdBy: userId } // changes made
     },
   });
       setCreatedMatch(res.data);
@@ -1213,6 +1227,12 @@ const Matches = () => {
     console.log("✅ Streaming stopped");
   };
 
+    // Pagination logic
+  const indexOfLastMatch = currentPage * matchesPerPage;
+  const indexOfFirstMatch = indexOfLastMatch - matchesPerPage;
+  const currentMatches = matches.slice(indexOfFirstMatch, indexOfLastMatch);
+  const totalPages = Math.ceil(matches.length / matchesPerPage);
+
 
   return (
     <div className="p-6">
@@ -1276,7 +1296,7 @@ const Matches = () => {
       )}
 
       {/* Matches List */}
-      {loading ? (
+      {/* {loading ? (
         <p>Loading matches...</p>
       ) : matches.length > 0 ? (
         <div className="grid gap-4">
@@ -1293,19 +1313,44 @@ const Matches = () => {
         </div>
       ) : (
         <p>No matches found for {activeTab}.</p>
+      )} */}
+
+      {/* Matches */}
+      {loading ? (
+        <p className="text-center text-gray-500">Loading matches...</p>
+      ) : currentMatches.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {currentMatches.map((match, index) => (
+            <MatchCard key={index} match={match} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-500">No matches found for {activeTab}.</p>
       )}
 
-      {/* Create Match Button */}
-      {/* {!createdMatch && (
-        <div className="mt-6 text-center">
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-3 mt-8">
           <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
           >
-            Create Match
+            Previous
+          </button>
+          <span className="text-gray-700 font-semibold">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
           </button>
         </div>
-      )} */}
+      )}
+
+
 
       {/* Create Match Modal */}
       {showForm && !createdMatch && (

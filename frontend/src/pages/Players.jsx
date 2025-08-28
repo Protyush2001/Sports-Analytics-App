@@ -1226,6 +1226,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PlayerCard from "../components/PlayerCard";
 import axios from "axios";
+// import AuthContext from "../context/AuthContext";
+
+
 
 const API_BASE = "http://localhost:3026/api/players";
 
@@ -1233,7 +1236,12 @@ const Players = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
-  const userId = JSON.parse(localStorage.getItem("userId"));
+  const userId = localStorage.getItem("userId");
+//   const { user } = useContext(AuthContext);
+//   const token = user?.token;
+// const role = user?.role;
+// const userId = user?._id;
+
 
   const [players, setPlayers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -1283,6 +1291,7 @@ const Players = () => {
     try {
       const res = await axios.get(API_BASE, {
         headers: { Authorization: `Bearer ${token}` },
+        params: { createdBy: userId },
       });
       console.log("Fetched players:", res.data); // Debug
       setPlayers(res.data);

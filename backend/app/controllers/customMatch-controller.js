@@ -24,6 +24,13 @@ const customMatchController = {}
 
 customMatchController.createMatches = async (req, res) => {
   try {
+        // ✅ Role-based access control
+    const allowedRoles = ["admin", "team_owner","player"];
+    if (!allowedRoles.includes(req.user.role)) {
+      
+      return res.status(403).json({ msg: "Access denied: insufficient permissions" });
+    }
+
     const { error } = customMatchValidationSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ msg: error.details[0].message });

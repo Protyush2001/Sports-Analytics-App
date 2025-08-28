@@ -123,10 +123,11 @@ userController.login = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" });
         }
 
-        // ✅ include role in token
+       
         const tokenData = {
             userId: user._id,
-            role: user.role,  // e.g., "player", "teamOwner", "admin", "generalUser"
+            role: user.role,
+            username: user.username // changesmade here
         };
 
         const token = jwt.sign(tokenData, 'secret@123', { expiresIn: '7d' });
@@ -134,7 +135,14 @@ userController.login = async (req, res) => {
         res.status(200).json({
             message: "Login successful",
             token: token,
-            role: user.role // frontend can redirect based on this
+            role: user.role, 
+              user: {
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    role: user.role
+  }
+
         });
 
         console.log("Login successful:", user.role);

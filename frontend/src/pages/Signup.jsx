@@ -88,6 +88,7 @@ import React, { useState } from "react";
 import Inputfield from "../components/forms/Inputfield";
 import Button from "../components/forms/Button";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -96,6 +97,8 @@ const Signup = () => {
     password: "",
     role: "general_user", // default role
   });
+
+    const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -115,6 +118,9 @@ const Signup = () => {
         password: "",
         role: "general_user",
       });
+      setTimeout(()=>{
+        navigate("/login");
+      },1000)
       console.log(res.data);
     } catch (err) {
       alert("Signup failed ❌");

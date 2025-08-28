@@ -143,16 +143,29 @@ const Login = () => {
     });
 
     if (res.status === 200) {
-      const { token, role, userId, message } = res.data;
+      const { token, role, user, message } = res.data;
 
-      // ✅ Save token & role in localStorage for later use
+      // changes made here --
+              const userData = {
+          _id: user._id,
+          username: user.username, // ✅ added this
+          email: user.email,
+          role: user.role,
+        };
+
+
+      // Save token & role in localStorage for later use
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
-      localStorage.setItem("userId", userId);
+      localStorage.setItem("userId",  user._id);
+      // localStorage.setItem("username", user.username);
+      // localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(userData));
+
 
       setMessage(message || "Login successful 🎉");
 
-      // ✅ Redirect based on role
+      //  Redirect based on role
       setTimeout(() => {
         if (role === "player") {
           navigate("/players");
@@ -165,7 +178,7 @@ const Login = () => {
         }
       }, 1000);
 
-      // ✅ Clear input fields
+      //  Clear input fields
       setEmail("");
       setPassword("");
     } else {

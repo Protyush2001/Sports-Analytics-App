@@ -116,7 +116,7 @@ const Analytics = () => {
   const [bestTeam, setBestTeam] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const userId = JSON.parse(localStorage.getItem("userId"));
+  const userId = localStorage.getItem("userId");
   const role = localStorage.getItem("role");
 
   useEffect(() => {

@@ -18,6 +18,7 @@ const matchController = require('./app/controllers/match-controller');
 const customMatchController = require('./app/controllers/customMatch-controller');
 const playerRoutes = require('./app/routes/playerRoutes');
 const matchStreamRoutes = require('./app/routes/matchStreamRoutes');
+const adminRoutes = require('./app/routes/adminRoutes');
 connectDB();
 app.use(express.json());
 app.use(cors());
@@ -37,10 +38,10 @@ app.post('/login',userController.login);
 app.post('/matches',authenticateUser, customMatchController.createMatches);
 app.patch('/matches/:id/ball',customMatchController.updateBall);
 
-app.use('/api/players', playerRoutes);
+app.use('/api/players',  playerRoutes); // changes made here
 app.use('/uploads', express.static( 'uploads'));
 
-app.use('/api/matches', matchRoutes);
+app.use('/api/matches',authenticateUser,  matchRoutes); // changes made
 app.use('/api/matches', matchStreamRoutes);
 
 // only players, team owners, admins can access
@@ -49,9 +50,23 @@ app.get("/players", authenticateUser, authorizeRoles("player", "teamOwner", "adm
 });
 
 // only admin can access
-app.get("/admin", authenticateUser, authorizeRoles("admin"), (req, res) => {
-    res.send("Admin dashboard");
-});
+app.use("/admin", authenticateUser, authorizeRoles("admin"), adminRoutes);
+
+
+// ✅ GET /admin/users → list all users
+app.use("/admin/users", authenticateUser, authorizeRoles("admin"), adminRoutes);
+
+// ✅ DELETE /admin/user/:id → remove user
+app.use("/admin/user/:id", authenticateUser, authorizeRoles("admin"), adminRoutes);
+
+// ✅ PATCH /admin/user/:id → update role or status
+app.use("/admin/user/:id", authenticateUser, authorizeRoles("admin"), adminRoutes);
+
+// ✅ GET /admin/matches → monitor match activity
+app.use("/admin/matches", authenticateUser, authorizeRoles("admin"), adminRoutes);
+
+// DELETE /admin/matches/:id -> delete match
+app.use("/admin/matches/:id", authenticateUser, authorizeRoles("admin"), adminRoutes);
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
