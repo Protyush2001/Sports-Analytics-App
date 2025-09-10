@@ -110,6 +110,7 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React from "react";
+import {useState} from "react";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Players from "./pages/Players";
@@ -121,14 +122,22 @@ import Signup from "./pages/Signup";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
+import ChatBotLauncher from "./components/ChatBotLauncher";
+import Profile from "./pages/Profile";
+// import { Elements } from '@stripe/react-stripe-js';
+// import { loadStripe } from '@stripe/stripe-js';
+
+// const stripePromise = loadStripe('pk_test_51S4mqxCTAL2OsiupdEnFuDrML5hlecmBRSYj6urlyGvL8P2YRc9wEkRsvXZWqTuJEfGoVdZzuYhy12F9FNIo2U0D00KQZDdWRv');
+
 // import AuthProvider from "./context/AuthProvider";
 
 function App() {
+  // const [teams, setTeams] = useState([]);
   return (
-  
+  <>
     <Router>
       <Navbar />
-      <div className="container mx-auto p-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -167,7 +176,7 @@ function App() {
             path="/analytics"
             element={
               <ProtectedRoute allowedRoles={["admin", "player", "team_owner"]}>
-                <Analytics />
+                <Analytics  />
               </ProtectedRoute>
             }
           />
@@ -180,12 +189,19 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
         </Routes>
 
 
       </div>
       <Footer />
     </Router>
+    <ChatBotLauncher />
+  </>
 
   );
 }

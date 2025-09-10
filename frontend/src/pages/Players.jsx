@@ -1294,7 +1294,7 @@ const Players = () => {
         params: { createdBy: userId },
       });
       console.log("Fetched players:", res.data); // Debug
-      setPlayers(res.data);
+      setPlayers(res.data.players || []); // changes made here
     } catch (err) {
       console.error("Error fetching players:", err.response?.data || err.message);
       setError("Failed to fetch players.");
@@ -1320,19 +1320,6 @@ const Players = () => {
     setIsModalOpen(true);
   };
 
-  // Delete player from DB
-  // const handleDelete = async (id) => {
-  //   if (!window.confirm("Are you sure you want to delete this player?")) return;
-  //   try {
-  //     await axios.delete(`${API_BASE}/${id}`, {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     setPlayers(players.filter((p) => p._id !== id));
-  //   } catch (err) {
-  //     console.error("Error deleting player:", err.response?.data || err.message);
-  //     setError("Failed to delete player.");
-  //   }
-  // };
 
   const handleDelete = async (id) => {
   if (!id) {
@@ -1388,43 +1375,7 @@ const Players = () => {
   };
 
   // Input change handler
-  // const handleInputChange = async (e) => {
-  //   const { name, value, files } = e.target;
 
-  //   if (name === "image" && files?.[0]) {
-  //     const file = files[0];
-
-  //     // Validate file type
-  //     if (!file.type.startsWith("image/")) {
-  //       setError("Please upload a valid image file (e.g., JPEG, PNG).");
-  //       return;
-  //     }
-
-  //     // Validate file size (max 2MB)
-  //     const maxSizeMB = 2;
-  //     if (file.size > maxSizeMB * 1024 * 1024) {
-  //       setError(`Image size should be less than ${maxSizeMB}MB.`);
-  //       return;
-  //     }
-
-  //     try {
-  //       const base64 = await convertToBase64(file);
-  //       console.log("Base64 image:", base64.slice(0, 50)); // Debug
-  //       setFormData((prev) => ({
-  //         ...prev,
-  //         image: base64,
-  //       }));
-  //     } catch (err) {
-  //       console.error("Error converting image to base64:", err);
-  //       setError("Failed to process image. Try a different file.");
-  //     }
-  //   } else {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       [name]: value,
-  //     }));
-  //   }
-  // };
 
   const handleInputChange = (e) => {
   const { name, value, files } = e.target;
@@ -1439,62 +1390,7 @@ const Players = () => {
 };
 
   // Save logic for Add or Update
-  // const handleSave = async () => {
-  //   try {
-  //     // Validate required fields
-  //     if (!formData.name?.trim() || !formData.role?.trim()) {
-  //       setError("Name and role are required.");
-  //       return;
-  //     }
 
-  //     // Prepare payload
-  //     const payload = {
-  //       name: formData.name.trim(),
-  //       age: Number(formData.age) || 0,
-  //       role: formData.role.trim(),
-  //       battingStyle: formData.battingStyle?.trim() || "",
-  //       bowlingStyle: formData.bowlingStyle?.trim() || "",
-  //       image: formData.image || undefined, // Let schema handle default if undefined
-  //       matches: Number(formData.matches) || 0,
-  //       average: Number(formData.average) || 0,
-  //       runs: Number(formData.runs) || 0,
-  //       wickets: Number(formData.wickets) || 0,
-  //       createdBy: userId,
-  //     };
-
-  //     // Debug payload
-  //     console.log("Payload to send:", payload);
-
-  //     const config = {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     };
-
-  //     // Save or update
-  //     const res = isEditMode
-  //       ? await axios.put(`${API_BASE}/${selectedPlayer._id}`, payload, config)
-  //       : await axios.post(API_BASE, payload, config);
-
-  //     console.log("Server response:", res.data); // Debug
-
-  //     // Update local state
-  //     setPlayers((prev) =>
-  //       isEditMode
-  //         ? prev.map((p) => (p._id === selectedPlayer._id ? res.data : p))
-  //         : [...prev, res.data]
-  //     );
-
-  //     // Reset modal
-  //     setIsModalOpen(false);
-  //     setSelectedPlayer(null);
-  //     setError("");
-  //   } catch (err) {
-  //     console.error("Error saving player:", err.response?.data || err.message);
-  //     setError(err.response?.data?.error || "Failed to save player. Please try again.");
-  //   }
-  // };
 
   const handleSave = async () => {
   try {

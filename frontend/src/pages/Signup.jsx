@@ -84,11 +84,138 @@
 
 
 
+// import React, { useState } from "react";
+// import Inputfield from "../components/forms/Inputfield";
+// import Button from "../components/forms/Button";
+// import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+
+// const Signup = () => {
+//   const [formData, setFormData] = useState({
+//     username: "",
+//     email: "",
+//     password: "",
+//     role: "general_user", // default role
+//   });
+//   const [showPayment, setShowPayment] = useState(false);
+
+//     const navigate = useNavigate();
+
+//   const handleChange = (e) => {
+//     setFormData({
+//       ...formData,
+//       [e.target.name]: e.target.value,
+//     });
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     try {
+//       const res = await axios.post("http://localhost:3026/register", formData);
+//       alert("Signup successful 🎉");
+//       setFormData({
+//         username: "",
+//         email: "",
+//         password: "",
+//         role: "general_user",
+//       });
+//       setTimeout(()=>{
+//         navigate("/login");
+//       },1000)
+//       console.log(res.data);
+//     } catch (err) {
+//       alert("Signup failed ❌");
+//       console.error(err);
+//     }
+//   };
+
+//   return (
+//     <div className="flex justify-center items-center h-screen bg-gray-100">
+//       <form
+//         onSubmit={handleSubmit}
+//         className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
+//       >
+//         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+
+//         {/* Username */}
+//         <div className="mb-4">
+//           <Inputfield
+//             label="Username"
+//             type="text"
+//             id="username"
+//             name="username"
+//             required
+//             onChange={handleChange}
+//           />
+//         </div>
+
+//         {/* Email */}
+//         <div className="mb-4">
+//           <Inputfield
+//             label="Email"
+//             type="email"
+//             id="email"
+//             name="email"
+//             required
+//             onChange={handleChange}
+//           />
+//         </div>
+
+//         {/* Password */}
+//         <div className="mb-4">
+//           <Inputfield
+//             label="Password"
+//             type="password"
+//             id="password"
+//             name="password"
+//             required
+//             onChange={handleChange}
+//           />
+//         </div>
+
+//         {/* Role Selection */}
+//         <div className="mb-4">
+//           <label
+//             htmlFor="role"
+//             className="block text-gray-700 font-medium mb-2"
+//           >
+//             Select Role
+//           </label>
+//           <select
+//             id="role"
+//             name="role"
+//             value={formData.role}
+//             onChange={handleChange}
+//             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+//           >
+//             <option value="general_user">General User</option>
+//             <option value="player">Player</option>
+//             <option value="team_owner">Team Owner</option>
+//             <option value="admin">Admin</option>
+//           </select>
+//         </div>
+
+//         {/* Submit */}
+//         <Button label="Sign Up" type="submit" />
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default Signup;
+
+
 import React, { useState } from "react";
 import Inputfield from "../components/forms/Inputfield";
 import Button from "../components/forms/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import PaymentForm from "../components/PaymentForm"; // Adjust path if needed
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('pk_test_51S4mqxCTAL2OsiupdEnFuDrML5hlecmBRSYj6urlyGvL8P2YRc9wEkRsvXZWqTuJEfGoVdZzuYhy12F9FNIo2U0D00KQZDdWRv');
+
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -98,7 +225,8 @@ const Signup = () => {
     role: "general_user", // default role
   });
 
-    const navigate = useNavigate();
+  const [showPayment, setShowPayment] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -109,6 +237,15 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (["team_owner", "admin"].includes(formData.role)) {
+      setShowPayment(true); // Show Stripe form
+    } else {
+      await registerUser(); // Free signup
+    }
+  };
+
+  const registerUser = async () => {
     try {
       const res = await axios.post("http://localhost:3026/register", formData);
       alert("Signup successful 🎉");
@@ -118,9 +255,9 @@ const Signup = () => {
         password: "",
         role: "general_user",
       });
-      setTimeout(()=>{
+      setTimeout(() => {
         navigate("/login");
-      },1000)
+      }, 1000);
       console.log(res.data);
     } catch (err) {
       alert("Signup failed ❌");
@@ -129,77 +266,97 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
-      >
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
 
-        {/* Username */}
-        <div className="mb-4">
-          <Inputfield
-            label="Username"
-            type="text"
-            id="username"
-            name="username"
-            required
-            onChange={handleChange}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          {/* Username */}
+          <div className="mb-4">
+            <Inputfield
+              label="Username"
+              type="text"
+              id="username"
+              name="username"
+              required
+              onChange={handleChange}
+            />
+          </div>
 
-        {/* Email */}
-        <div className="mb-4">
-          <Inputfield
-            label="Email"
-            type="email"
-            id="email"
-            name="email"
-            required
-            onChange={handleChange}
-          />
-        </div>
+          {/* Email */}
+          <div className="mb-4">
+            <Inputfield
+              label="Email"
+              type="email"
+              id="email"
+              name="email"
+              required
+              onChange={handleChange}
+            />
+          </div>
 
-        {/* Password */}
-        <div className="mb-4">
-          <Inputfield
-            label="Password"
-            type="password"
-            id="password"
-            name="password"
-            required
-            onChange={handleChange}
-          />
-        </div>
+          {/* Password */}
+          <div className="mb-4">
+            <Inputfield
+              label="Password"
+              type="password"
+              id="password"
+              name="password"
+              required
+              onChange={handleChange}
+            />
+          </div>
 
-        {/* Role Selection */}
-        <div className="mb-4">
-          <label
-            htmlFor="role"
-            className="block text-gray-700 font-medium mb-2"
-          >
-            Select Role
-          </label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-          >
-            <option value="general_user">General User</option>
-            <option value="player">Player</option>
-            <option value="team_owner">Team Owner</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
+          {/* Role Selection */}
+          <div className="mb-4">
+            <label
+              htmlFor="role"
+              className="block text-gray-700 font-medium mb-2"
+            >
+              Select Role
+            </label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            >
+              <option value="general_user">General User</option>
+              <option value="player">Player</option>
+              <option value="team_owner">Team Owner</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
-        {/* Submit */}
-        <Button label="Sign Up" type="submit" />
-      </form>
+          {/* Submit */}
+          <div className="flex flex-col items-center">
+            <Button label="Sign Up" type="submit" disabled={showPayment} />
+          <a className="mt-4 text-center text-sm text-blue-600" href="/login">
+            Already have an account? Login
+          </a>
+          </div>
+
+        </form>
+
+        {/* Stripe Payment Form */}
+        {showPayment && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-2 text-center">
+              Complete Payment to Register as {formData.role}
+            </h3>
+    <Elements stripe={stripePromise}>
+      <PaymentForm
+        role={formData.role}
+        onPaymentSuccess={registerUser}
+      />
+    </Elements>
+
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default Signup;
-

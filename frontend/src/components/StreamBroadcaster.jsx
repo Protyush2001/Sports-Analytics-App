@@ -15,6 +15,10 @@ export default function StreamBroadcaster({ match }) {
   const socketRef = useRef(null);
   const pcsRef = useRef(new Map()); // viewerId -> RTCPeerConnection
 
+    // NEW: recording states
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+
   const start = async () => {
     try {
       // update DB
@@ -26,6 +30,18 @@ export default function StreamBroadcaster({ match }) {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localStreamRef.current = stream;
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+
+            // === NEW: start recording locally ===
+      const recorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm; codecs=vp9',
+      });
+      recordedChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      // ====================================
 
       // signaling
       const socket = io(SIGNALING_URL, { auth: { token } });
@@ -75,12 +91,54 @@ export default function StreamBroadcaster({ match }) {
       await axios.post(`http://localhost:3026/api/matches/${match._id}/stop-stream`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
-    } catch {}
-    pcsRef.current.forEach(pc => pc.close());
+    } catch(err) {
+      console.log(err)
+    }
+    // pcsRef.current.forEach(pc => pc.close());
+    // pcsRef.current.clear();
+    // localStreamRef.current?.getTracks().forEach(t => t.stop());
+    // localStreamRef.current = null;
+    // if (localVideoRef.current) localVideoRef.current.srcObject = null;
+    // socketRef.current?.disconnect();
+    // socketRef.current = null;
+    
+    // === NEW: stop recording and upload ===
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.onstop = async () => {
+        // combine chunks
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        const formData = new FormData();
+        formData.append('video', blob, `${match._id}.webm`);
+
+        try {
+          await axios.post(
+            `http://localhost:3026/api/matches/${match._id}/uploadRecording`,
+            formData,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          console.log('Recording uploaded successfully');
+        } catch (uploadErr) {
+          console.error('Upload error', uploadErr);
+        }
+        recordedChunksRef.current = [];
+      };
+
+      mediaRecorderRef.current.stop();
+    }
+    // =======================================
+
+    // Close peer connections
+    pcsRef.current.forEach((pc) => pc.close());
     pcsRef.current.clear();
-    localStreamRef.current?.getTracks().forEach(t => t.stop());
+
+    // Stop local stream
+    localStreamRef.current?.getTracks().forEach((t) => t.stop());
     localStreamRef.current = null;
+
+    // Clear video element
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
+
+    // Disconnect socket
     socketRef.current?.disconnect();
     socketRef.current = null;
     setPublishing(false);

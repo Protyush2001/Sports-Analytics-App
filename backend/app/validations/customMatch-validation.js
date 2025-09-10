@@ -46,6 +46,15 @@ const customMatchValidationSchema = Joi.object({
     balls: Joi.number().min(0).default(0),
     innings: Joi.number().min(1).default(1)
   }).required(),
+  inningsScores: Joi.array().items(
+    Joi.object({
+      team: Joi.number().valid(0, 1).required(),
+      runs: Joi.number().min(0).required(),
+      wickets: Joi.number().min(0).required(),
+      overs: Joi.number().min(0).required(),
+      balls: Joi.number().min(0).required()
+    })
+  ).required(),
   status: Joi.string()
     .valid("Upcoming", "Live", "Completed")
     .default("Upcoming"),
