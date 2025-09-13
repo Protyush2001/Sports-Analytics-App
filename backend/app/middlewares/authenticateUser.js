@@ -21,6 +21,8 @@
 
 
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 
 const authenticateUser = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -37,7 +39,7 @@ const authenticateUser = (req, res, next) => {
   }
 
   try {
-    const tokenData = jwt.verify(token, 'secret@123'); // secret should be in env file
+    const tokenData = jwt.verify(token, process.env.JWT_SECRET); // secret should be in env file
     console.log('Token data:', tokenData);
 
     // Attach user ID to request object

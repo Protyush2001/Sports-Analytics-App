@@ -66,10 +66,10 @@ const Login = () => {
     if (res.status === 200) {
       const { token, role, user, message } = res.data;
 
-      // changes made here --
-              const userData = {
+      
+        const userData = {
           _id: user._id,
-          username: user.username, // ✅ added this
+          username: user.username, 
           email: user.email,
           role: user.role,
         };
@@ -79,8 +79,7 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
       localStorage.setItem("userId",  user._id);
-      // localStorage.setItem("username", user.username);
-      // localStorage.setItem("user", JSON.stringify(user));
+      
       localStorage.setItem("user", JSON.stringify(userData));
 
 
