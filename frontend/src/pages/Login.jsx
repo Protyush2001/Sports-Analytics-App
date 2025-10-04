@@ -89,8 +89,8 @@ const Login = () => {
       setTimeout(() => {
         if (role === "player") {
           navigate("/players");
-        } else if (role === "teamOwner") {
-          navigate("/teams");
+        } else if (role === "team_owner") {
+          navigate("/analytics");
         } else if (role === "admin") {
           navigate("/admin");
         } else if(role==="general user"){

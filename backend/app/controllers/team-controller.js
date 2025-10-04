@@ -156,6 +156,16 @@ teamCtlr.getTeams = async (req, res) => {
   }
 };
 
+teamCtlr.getTeamsById = async (req,res) =>{
+  try{
+    const id = req.params.id;
+    const team = await Team.findById(id);
+    return res.status(200).json(team)
+  }catch(err){
+    return res.status(500).json(err);
+  }
+}
+
 teamCtlr.deleteTeam = async (req,res) =>{
   const id = req.params.id;
   try{
@@ -242,6 +252,31 @@ teamCtlr.addPlayersToTeam = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+// teamCtlr.getPointsTable = async (req, res) => {
+//   try {
+//     const teams = await Team.find().select('name matchesPlayed wins losses points').lean();
+//     res.status(200).json(teams);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
+// Fixed Team Controller - getPointsTable
+teamCtlr.getPointsTable = async (req, res) => {
+  try {
+    const teams = await Team.find()
+      .select('name matchesPlayed wins losses points')
+      .sort({ points: -1, wins: -1 }) // Sort by points desc, then wins desc
+      .lean();
+    
+    res.status(200).json(teams);
+  } catch (err) {
+    console.error('Error fetching points table:', err);
+    res.status(500).json({ error: 'Failed to fetch points table' });
+  }
+};
+
 
 
 module.exports = teamCtlr;

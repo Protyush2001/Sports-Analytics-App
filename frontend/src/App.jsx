@@ -124,6 +124,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
 import ChatBotLauncher from "./components/ChatBotLauncher";
 import Profile from "./pages/Profile";
+import PointsTable from "./pages/PointsTable";
 // import { Elements } from '@stripe/react-stripe-js';
 // import { loadStripe } from '@stripe/stripe-js';
 
@@ -180,7 +181,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-                        {/* ✅ Admin route with role protection */}
+                        {/* Admin route with role protection */}
       <Route
         path="/admin"
         element={
@@ -194,7 +195,15 @@ function App() {
             <Profile />
           </ProtectedRoute>
         } />
+
+        <Route path="/points-table" element={
+          <ProtectedRoute>
+            <PointsTable />
+          </ProtectedRoute>
+        } />
         </Routes>
+
+        
 
 
       </div>

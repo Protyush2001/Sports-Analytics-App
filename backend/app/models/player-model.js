@@ -1,14 +1,4 @@
-// const playerSchema = new mongoose.Schema({
-//     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-//     battingStyle: { type: String },
-//     bowlingStyle: { type: String },
-//     matchesPlayed: { type: Number, default: 0 },
-//     runs: { type: Number, default: 0 },
-//     wickets: { type: Number, default: 0 }
-// }, { timestamps: true });
 
-// const Player = mongoose.model("Player", playerSchema);
-// module.exports = Player;
 
 
 const mongoose = require("mongoose");

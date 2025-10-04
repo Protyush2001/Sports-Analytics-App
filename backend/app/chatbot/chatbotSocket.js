@@ -1,27 +1,3 @@
-// const { generateReply } = require("./geminiService");
-
-// function registerChatbotHandlers(io) {
-//   io.on("connection", (socket) => {
-//     console.log("Chatbot socket connected:", socket.id);
-
-//     socket.on("userMessage", async (msg) => {
-//       try {
-//         const reply = await generateReply(msg);
-//         socket.emit("botReply", reply);
-//       } catch (err) {
-//         console.error("Chatbot error:", err.message);
-//         socket.emit("botReply", "Sorry, I couldn't process that.");
-//       }
-//     });
-
-//     socket.on("disconnect", () => {
-//       console.log("Chatbot socket disconnected:", socket.id);
-//     });
-//   });
-// }
-
-// module.exports = registerChatbotHandlers;
-
 
 const { generateReply } = require("./geminiService");
 const { getMatchInsights } = require("./contextBuilder");
@@ -302,7 +278,7 @@ function formatLiveMatchesResponse(matches) {
     return "There are currently no live matches. Check the matches section for upcoming fixtures!";
   }
   
-  return `🔴 Live Matches:\n${liveMatches
+  return `Live Matches:\n${liveMatches
     .map(match => `• ${match.teams} - ${match.score || 'Score updating...'} (${match.overs || 0} overs)`)
     .join('\n')}`;
 }

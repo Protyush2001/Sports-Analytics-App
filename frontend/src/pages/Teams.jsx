@@ -1,3 +1,6 @@
+
+
+
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
 // import { useNavigate } from "react-router-dom";
@@ -5,36 +8,49 @@
 // const Teams = () => {
 //   const [teams, setTeams] = useState([]);
 //   const [players, setPlayers] = useState([]);
+//   const [loadingPlayers, setLoadingPlayers] = useState(false);
 //   const [selectedTeam, setSelectedTeam] = useState(null);
 //   const [showModal, setShowModal] = useState(false);
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     coach: "",
-//     selectedPlayers: [],
-//   });
+//   const [addModal, setAddModal] = useState(false);
+//   const [formData, setFormData] = useState({ name: "", coach: "", selectedPlayers: [] });
+//   const [searchQuery, setSearchQuery] = useState("");
 
 //   const token = localStorage.getItem("token");
 //   const role = localStorage.getItem("role");
+//   const userId = localStorage.getItem("userId");
 //   const navigate = useNavigate();
 
-//   // Initial fetch of teams
-//   useEffect(() => {
-//     const fetchTeams = async () => {
-//       try {
-//         const res = await axios.get("http://localhost:3026/api/teams", {
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-//         setTeams(res.data);
-//       } catch (err) {
-//         console.error("Error fetching teams:", err.message);
-//       }
-//     };
+//   const fetchTeams = async () => {
+//     try {
+//       const res = await axios.get("http://localhost:3026/api/teams", {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//       setTeams(res.data);
+//     } catch (err) {
+//       console.error("Error fetching teams:", err.message);
+//     }
+//   };
 
+//   useEffect(() => {
 //     fetchTeams();
 //   }, [token]);
 
-//   // Fetch players when modal opens
-// const fetchPlayers = async () => {
+//   // const fetchPlayers = async () => {
+//   //   setLoadingPlayers(true);
+//   //   try {
+//   //     const res = await axios.get("http://localhost:3026/api/players/unassigned", {
+//   //       headers: { Authorization: `Bearer ${token}` },
+//   //     });
+//   //     setPlayers(res.data);
+//   //   } catch (err) {
+//   //     console.error("Error fetching unassigned players:", err.message);
+//   //     setPlayers([]);
+//   //   } finally {
+//   //     setLoadingPlayers(false);
+//   //   }
+//   // };
+
+//   const fetchPlayers = async () => {
 //   try {
 //     const teamRes = await axios.get("http://localhost:3026/api/teams", {
 //       headers: { Authorization: `Bearer ${token}` },
@@ -63,352 +79,7 @@
 //     setPlayers([]); // fallback to empty array
 //   }
 // };
-//   const handleChange = (e) => {
-//     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-//   };
 
-//   const handlePlayerSelect = (e) => {
-//     const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
-//     if (selected.length <= 20) {
-//       setFormData((prev) => ({ ...prev, selectedPlayers: selected }));
-//     } else {
-//       alert("Maximum 20 players allowed per team.");
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (formData.selectedPlayers.length > 20) {
-//       alert("You can only select up to 20 players.");
-//       return;
-//     }
-
-//     try {
-//       await axios.post(
-//         "http://localhost:3026/api/teams",
-//         {
-//           name: formData.name,
-//           coach: formData.coach,
-//           players: formData.selectedPlayers,
-//         },
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-//       alert("Team created successfully!");
-//       setShowModal(false);
-//       window.location.reload();
-//     } catch (err) {
-//       console.error("Error creating team:", err.message);
-//     }
-//   };
-
-// //   const handleDelete = async (teamId) => {
-// //     if(window.confirm("Are you sure you want to delete this team?")) {
-// //       try{
-// //         await axios.delete(`http://localhost:3026/api/teams/${teamId}`,{
-// //           headers: { Authorization: `Bearer ${token}`}
-// //         })
-// //       }catch(err){
-// //         console.log(err);
-// //       }
-// //   }
-// // }
-
-// // const handleRemovePlayer = async (playerId) => {
-// //   if(window.confirm("Are you sure you want to remove this player from the team?")){
-// //     try{
-// //       setSelectedTeam((prevTeam) =>{
-// //         const updatedPlayers = prevTeam.players.filter((p) => p._id !== playerId);
-// //         return { players: updatedPlayers };
-// //       })
-// //     }catch(err){
-// //       console.log(err)
-// //     }
-// //   }
-// // }
-
-// const refreshSelectedTeam = async (teamId) => {
-//   try {
-//     const res = await axios.get(`http://localhost:3026/api/teams/${teamId}`, {
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//     setSelectedTeam(res.data); // ✅ This ensures fresh data
-//   } catch (err) {
-//     console.error("Error refreshing team:", err.message);
-//   }
-// };
-
-// const refreshTeams = async () => {
-//   try {
-//     const res = await axios.get("http://localhost:3026/api/teams", {
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//     setTeams(res.data);
-//   } catch (err) {
-//     console.error("Error refreshing teams:", err.message);
-//   }
-// };
-
-// // const handleRemovePlayer = async (playerId) => {
-// //   if (window.confirm("Are you sure you want to remove this player from the team?")) {
-// //     try {
-// //       const res = await axios.patch(
-// //         `http://localhost:3026/api/teams/${selectedTeam._id}/remove-player/${playerId}`,
-// //         {},
-// //         {
-// //           headers: { Authorization: `Bearer ${token}` },
-// //         }
-// //       );
-
-// //       setSelectedTeam(res.data); // ✅ Update modal with new team data
-// //     } catch (err) {
-// //       console.error("Error removing player:", err.message);
-// //     }
-// //   }
-// // };
-
-// const handleRemovePlayer = async (playerId) => {
-//   if (window.confirm("Are you sure you want to remove this player from the team?")) {
-//     try {
-//       const res = await axios.patch(
-//         `http://localhost:3026/api/teams/${selectedTeam._id}/remove-player/${playerId}`,
-//         {},
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-
-//       setSelectedTeam({ ...res.data }); // ✅ update modal
-//       refreshTeams(); // ✅ update team cards
-//     } catch (err) {
-//       console.error("Error removing player:", err.message);
-//     }
-//   }
-// };
-
-// const handleDelete = async (teamId) => {
-//   if (window.confirm("Are you sure you want to delete this team?")) {
-//     try {
-//       await axios.delete(`http://localhost:3026/api/teams/${teamId}`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-
-//       // ✅ Remove team from local state
-//       setTeams((prevTeams) => prevTeams.filter((team) => team._id !== teamId));
-//     } catch (err) {
-//       console.error("Error deleting team:", err.message);
-//     }
-//   }
-// };
-//   return (
-//     <div className="min-h-screen bg-gray-100 p-6">
-//       <h1 className="text-3xl font-bold text-center text-blue-700 mb-8">🏏 Teams</h1>
-
-//       {(role === "team_owner" || role === "admin") && (
-//         <div className="text-center mb-6">
-//           <button
-//             className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
-//             onClick={() => {
-//               fetchPlayers();
-//               setShowModal(true);
-//             }}
-//           >
-//             ➕ Create Team
-//           </button>
-//         </div>
-//       )}
-
-//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-//         {teams.map((team) => (
-//           <div key={team._id} className="bg-white shadow-md rounded-xl p-6">
-//             <h2 className="text-xl font-semibold text-indigo-600 mb-2">{team.name}</h2>
-//             <p className="text-gray-700 mb-1">Coach: {team.coach || "Not Assigned"}</p>
-//             <p className="text-gray-600 mb-4">Players: {team.players.length}</p>
-//             <button
-//               className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
-//               onClick={() => setSelectedTeam(team)}
-//             >
-//               View Details
-//             </button>
-//             <button onClick={()=>{handleDelete(team._id)}}>
-//               Delete Team
-//             </button>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Create Team Modal */}
-//       {showModal && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//           <div className="bg-white rounded-lg p-6 w-full max-w-xl">
-//             <h2 className="text-2xl font-bold text-blue-700 mb-4">Create New Team</h2>
-//             <form onSubmit={handleSubmit} className="space-y-4">
-//               <input
-//                 type="text"
-//                 name="name"
-//                 placeholder="Team Name"
-//                 value={formData.name}
-//                 onChange={handleChange}
-//                 required
-//                 className="w-full border px-4 py-2 rounded"
-//               />
-//               <input
-//                 type="text"
-//                 name="coach"
-//                 placeholder="Coach Name"
-//                 value={formData.coach}
-//                 onChange={handleChange}
-//                 required
-//                 className="w-full border px-4 py-2 rounded"
-//               />
-//               {players.length === 0 ? (
-//                 <p className="text-sm text-red-500">All players are already assigned to teams.</p>
-//               ) : (
-//                 <select
-//                   multiple
-//                   value={formData.selectedPlayers}
-//                   onChange={handlePlayerSelect}
-//                   className="w-full border px-4 py-2 rounded h-48"
-//                 >
-//                   {players.map((player) => (
-//                     <option key={player._id} value={player._id}>
-//                       {player.name} — {player.role}
-//                     </option>
-//                   ))}
-//                 </select>
-//               )}
-//               <button
-//                 type="submit"
-//                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-//               >
-//                 Submit
-//               </button>
-//               <button
-//                 type="button"
-//                 className="ml-4 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
-//                 onClick={() => setShowModal(false)}
-//               >
-//                 Cancel
-//               </button>
-//             </form>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Team Details Modal */}
-//       {selectedTeam && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//           <div className="bg-white rounded-lg p-6 w-full max-w-lg overflow-y-auto max-h-[90vh]">
-//             <h2 className="text-2xl font-bold text-blue-700 mb-4">{selectedTeam.name}</h2>
-//             <p className="text-gray-700 mb-2">Coach: {selectedTeam.coach}</p>
-//             <h3 className="text-lg font-semibold mb-2">Players:</h3>
-//             <ul className="space-y-3">
-//               {selectedTeam.players.map((player) => (
-//                 <li key={player._id} className="flex items-center gap-4">
-//                   <img
-//                     src={player.image}
-//                     alt={player.name}
-//                     className="w-12 h-12 rounded-full object-cover border"
-//                     onError={(e) => {
-//                       e.target.src = "https://via.placeholder.com/48?text=No+Image";
-//                     }}
-//                   />
-//                   <div>
-//                     <p className="font-medium">{player.name}</p>
-//                     <p className="text-sm text-gray-500">{player.role}</p>
-//                   </div>
-//                   <div>
-//                     <button className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition">Edit Player</button>
-//                     <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition" onClick={() => handleRemovePlayer(player._id)}>Remove Player</button>
-//                   </div>
-//                 </li>
-//               ))}
-//             </ul>
-//             <button
-//               className="mt-6 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-//               onClick={() => setSelectedTeam(null)}
-//             >
-//               Close
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Teams;
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-
-// const Teams = () => {
-//   const [teams, setTeams] = useState([]);
-//   const [players, setPlayers] = useState([]);
-//   const [selectedTeam, setSelectedTeam] = useState(null);
-//   const [showModal, setShowModal] = useState(false);
-//   const [formData, setFormData] = useState({ name: "", coach: "", selectedPlayers: [] });
-//   const [searchQuery, setSearchQuery] = useState("");
-
-//   const token = localStorage.getItem("token");
-//   const role = localStorage.getItem("role");
-//   const userId = localStorage.getItem("userId");
-//   const navigate = useNavigate();
-
-//   const fetchTeams = async () => {
-//     try {
-//       const res = await axios.get("http://localhost:3026/api/teams", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       setTeams(res.data);
-//     } catch (err) {
-//       console.error("Error fetching teams:", err.message);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchTeams();
-//   }, [token]);
-
-// // const fetchPlayers = async () => {
-// //   try {
-// //     const allPlayersRes = await axios.get("http://localhost:3026/api/players", {
-// //       headers: { Authorization: `Bearer ${token}` },
-// //     });
-
-// //     const teamsRes = await axios.get("http://localhost:3026/api/teams", {
-// //       headers: { Authorization: `Bearer ${token}` },
-// //     });
-
-// //     const assignedIds = teamsRes.data.flatMap((team) =>
-// //       team.players.map((p) => String(p._id))
-// //     );
-
-// //     const availablePlayers = allPlayersRes.data.filter(
-// //       (player) => !assignedIds.includes(String(player._id))
-// //     );
-
-// //     setPlayers(availablePlayers);
-// //   } catch (err) {
-// //     console.error("Error fetching players:", err.message);
-// //     setPlayers([]);
-// //   }
-// // };
-
-// const fetchPlayers = async () => {
-//   try {
-//     const res = await axios.get("http://localhost:3026/api/players/unassigned", {
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//     console.log(res.data);
-//     setPlayers(res.data);
-    
-//   } catch (err) {
-//     console.error("Error fetching unassigned players:", err.message);
-//     setPlayers([]);
-//   }
-// };
 //   const handleChange = (e) => {
 //     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 //   };
@@ -442,6 +113,7 @@
 //       );
 //       alert("Team created successfully!");
 //       setShowModal(false);
+//       setFormData({ name: "", coach: "", selectedPlayers: [] });
 //       fetchTeams();
 //     } catch (err) {
 //       console.error("Error creating team:", err.message);
@@ -460,6 +132,23 @@
 //       }
 //     }
 //   };
+// const handleAddPlayerToTeam = async (teamId, playerId) => {
+//   try {
+//     const res = await axios.patch(
+//       `http://localhost:3026/api/teams/${teamId}/add-player/${playerId}`,
+//       {},
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     );
+//     alert("Player added successfully!");
+//     fetchTeams(); // Refresh team data
+//   } catch (err) {
+//     const errorMessage =
+//       err.response?.data?.error || err.message || "Unknown error";
+//     console.error("Error adding player:", errorMessage);
+//     alert(`Failed to add player: ${errorMessage}`);
+//   }
+// };
+
 
 //   const handleRemovePlayer = async (playerId) => {
 //     if (window.confirm("Remove this player from the team?")) {
@@ -476,6 +165,56 @@
 //       }
 //     }
 //   };
+
+// const handleAddPlayers = async (e, teamId) => {
+//   e.preventDefault();
+//   try {
+//     await axios.patch(
+//       `http://localhost:3026/api/teams/${teamId}/add-players`,
+//       { players: formData.selectedPlayers },
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     );
+
+//     alert("Players added successfully!");
+//     setAddModal(false);
+//     setFormData((prev) => ({ ...prev, selectedPlayers: [] }));
+
+//     // ✅ Fetch updated team details with populated players
+//     const updatedTeam = await axios.get(`http://localhost:3026/api/teams/${teamId}`, {
+//       headers: { Authorization: `Bearer ${token}` },
+//     });
+
+//     setSelectedTeam(updatedTeam.data);
+//     fetchTeams(); // refresh team list
+//   } catch (err) {
+//     const errorMessage = err.response?.data?.error || err.message;
+//     console.error("Error adding players:", errorMessage);
+//     alert(`Failed to add players: ${errorMessage}`);
+//   }
+// };
+
+
+// // const handleEditPlayer = async (playerId) => {
+// //   const player = players.find((p) => p._id === playerId);
+
+// //   if (!player) {
+// //     console.error("Player not found:", playerId);
+// //     alert("Player not found.");
+// //     return;
+// //   }
+
+// //   console.log("Editing player:", player);
+// //   alert(`Editing player: ${player.name}`);
+
+// //   setFormData({
+// //     name: player.name || "",
+// //     role: player.role || "",
+// //     image: player.image || "",
+// //     selectedPlayers: [playerId],
+// //   });
+
+// //   setShowModal(true);
+// // };
 
 //   const filteredTeams = teams.filter((team) =>
 //     team.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -499,8 +238,8 @@
 //         <div className="text-center mb-6">
 //           <button
 //             className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
-//             onClick={() => {
-//               fetchPlayers();
+//             onClick={async () => {
+//               await fetchPlayers();
 //               setShowModal(true);
 //             }}
 //           >
@@ -557,7 +296,9 @@
 //                 required
 //                 className="w-full border px-4 py-2 rounded"
 //               />
-//               {Array.isArray(players) && players.length > 0 ? (
+//               {loadingPlayers ? (
+//                 <p className="text-sm text-gray-500">Loading players...</p>
+//               ) : Array.isArray(players) && players.length > 0 ? (
 //                 <select
 //                   multiple
 //                   value={formData.selectedPlayers}
@@ -591,12 +332,49 @@
 //         </div>
 //       )}
 
+//       {/* Add Players Modal */}
+//       {addModal && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//           <div className="bg-white rounded-lg p-6 w-full max-w-xl">
+//             <h2 className="text-2xl font-bold text-blue-700 mb-4">Add Players to Team</h2>
+//             <form onSubmit={(e) => handleAddPlayers(e, selectedTeam._id)} className="space-y-4">
+//               <select
+//                 multiple
+//                 value={formData.selectedPlayers}
+//                 onChange={handlePlayerSelect}
+//                 className="w-full border px-4 py-2 rounded h-48"
+//               >
+//                 {players.map((player) => (
+//                   <option key={player._id} value={player._id}>
+//                     {player.name} — {player.role}
+//                   </option>
+//                 ))}
+//               </select>
+//               <button
+//                 type="submit"
+//                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                
+//               >
+//                 Add Players
+//               </button>
+//               <button
+//                 type="button"
+//                 className="ml-4 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
+//                 onClick={() => setAddModal(false)}
+//               >
+//                 Cancel
+//               </button>
+//             </form>
+//           </div>
+//         </div>
+//       )}
+
 //       {/* Team Details Modal */}
 //       {selectedTeam && (
 //         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 //           <div className="bg-white rounded-lg p-6 w-full max-w-lg overflow-y-auto max-h-[90vh]">
-//             <h2 className="text-2xl font-bold text-blue-700 mb-4">{selectedTeam.name}</h2>
-//                         <p className="text-gray-700 mb-2">Coach: {selectedTeam.coach}</p>
+//                         <h2 className="text-2xl font-bold text-blue-700 mb-4">{selectedTeam.name}</h2>
+//             <p className="text-gray-700 mb-2">Coach: {selectedTeam.coach}</p>
 //             <h3 className="text-lg font-semibold mb-2">Players:</h3>
 //             <ul className="space-y-3">
 //               {selectedTeam.players.map((player) => (
@@ -613,14 +391,19 @@
 //                     <p className="font-medium">{player.name}</p>
 //                     <p className="text-sm text-gray-500">{player.role}</p>
 //                   </div>
-//                   {(role === "admin" || selectedTeam.createdBy === userId) && (
-//                     <button
-//                       className="ml-auto bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-//                       onClick={() => handleRemovePlayer(player._id)}
-//                     >
-//                       Remove
-//                     </button>
-//                   )}
+//       {(role === "admin" || selectedTeam.createdBy === userId) && (
+//         <div className="ml-auto flex gap-2">
+
+//           <button
+//             title="Remove player from team"
+//             className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+//             onClick={() => handleRemovePlayer(player._id)}
+//           >
+//             🗑️ Remove
+//           </button>
+//         </div>
+//       )}
+
 //                 </li>
 //               ))}
 //             </ul>
@@ -630,6 +413,18 @@
 //             >
 //               Close
 //             </button>
+//             {(role == 'admin' || selectedTeam.createdBy === userId) && (
+// <button
+//   className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+//    onClick={async () => {
+//               await fetchPlayers();
+//               setAddModal(true);
+//               setFormData((prev) => ({ ...prev, selectedPlayers: [] }));
+//            }}
+// >
+//   ➕ Add new Player 
+// </button>
+//             )}
 //           </div>
 //         </div>
 //       )}
@@ -638,8 +433,6 @@
 // };
 
 // export default Teams;
-
-//////////////////////////////////////////////////////////////////////////
 
 
 import React, { useEffect, useState } from "react";
@@ -676,50 +469,38 @@ const Teams = () => {
     fetchTeams();
   }, [token]);
 
-  // const fetchPlayers = async () => {
-  //   setLoadingPlayers(true);
-  //   try {
-  //     const res = await axios.get("http://localhost:3026/api/players/unassigned", {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     setPlayers(res.data);
-  //   } catch (err) {
-  //     console.error("Error fetching unassigned players:", err.message);
-  //     setPlayers([]);
-  //   } finally {
-  //     setLoadingPlayers(false);
-  //   }
-  // };
-
   const fetchPlayers = async () => {
-  try {
-    const teamRes = await axios.get("http://localhost:3026/api/teams", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      setLoadingPlayers(true);
+      const teamRes = await axios.get("http://localhost:3026/api/teams", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const playerRes = await axios.get("http://localhost:3026/api/players/unassigned", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const playerRes = await axios.get("http://localhost:3026/api/players/unassigned", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const allPlayers = Array.isArray(playerRes.data)
-      ? playerRes.data
-      : playerRes.data.players || [];
+      const allPlayers = Array.isArray(playerRes.data)
+        ? playerRes.data
+        : playerRes.data.players || [];
 
-    const assignedPlayerIds = teamRes.data.flatMap((team) =>
-      team.players.map((p) => String(p._id))
-    );
+      const assignedPlayerIds = teamRes.data.flatMap((team) =>
+        team.players.map((p) => String(p._id))
+      );
 
-    const availablePlayers = allPlayers.filter((player) => {
-      const id = String(player._id);
-      return id && !assignedPlayerIds.includes(id);
-    });
+      const availablePlayers = allPlayers.filter((player) => {
+        const id = String(player._id);
+        return id && !assignedPlayerIds.includes(id);
+      });
 
-    setPlayers(availablePlayers);
-  } catch (err) {
-    console.error("Error fetching players:", err.message);
-    setPlayers([]); // fallback to empty array
-  }
-};
+      setPlayers(availablePlayers);
+    } catch (err) {
+      console.error("Error fetching players:", err.message);
+      setPlayers([]);
+    } finally {
+      setLoadingPlayers(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -773,23 +554,23 @@ const Teams = () => {
       }
     }
   };
-const handleAddPlayerToTeam = async (teamId, playerId) => {
-  try {
-    const res = await axios.patch(
-      `http://localhost:3026/api/teams/${teamId}/add-player/${playerId}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    alert("Player added successfully!");
-    fetchTeams(); // Refresh team data
-  } catch (err) {
-    const errorMessage =
-      err.response?.data?.error || err.message || "Unknown error";
-    console.error("Error adding player:", errorMessage);
-    alert(`Failed to add player: ${errorMessage}`);
-  }
-};
 
+  const handleAddPlayerToTeam = async (teamId, playerId) => {
+    try {
+      const res = await axios.patch(
+        `http://localhost:3026/api/teams/${teamId}/add-player/${playerId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Player added successfully!");
+      fetchTeams();
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error || err.message || "Unknown error";
+      console.error("Error adding player:", errorMessage);
+      alert(`Failed to add player: ${errorMessage}`);
+    }
+  };
 
   const handleRemovePlayer = async (playerId) => {
     if (window.confirm("Remove this player from the team?")) {
@@ -807,268 +588,338 @@ const handleAddPlayerToTeam = async (teamId, playerId) => {
     }
   };
 
-const handleAddPlayers = async (e, teamId) => {
-  e.preventDefault();
-  try {
-    await axios.patch(
-      `http://localhost:3026/api/teams/${teamId}/add-players`,
-      { players: formData.selectedPlayers },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  const handleAddPlayers = async (e, teamId) => {
+    e.preventDefault();
+    try {
+      await axios.patch(
+        `http://localhost:3026/api/teams/${teamId}/add-players`,
+        { players: formData.selectedPlayers },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    alert("Players added successfully!");
-    setAddModal(false);
-    setFormData((prev) => ({ ...prev, selectedPlayers: [] }));
+      alert("Players added successfully!");
+      setAddModal(false);
+      setFormData((prev) => ({ ...prev, selectedPlayers: [] }));
 
-    // ✅ Fetch updated team details with populated players
-    const updatedTeam = await axios.get(`http://localhost:3026/api/teams/${teamId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const updatedTeam = await axios.get(`http://localhost:3026/api/teams/${teamId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setSelectedTeam(updatedTeam.data);
-    fetchTeams(); // refresh team list
-  } catch (err) {
-    const errorMessage = err.response?.data?.error || err.message;
-    console.error("Error adding players:", errorMessage);
-    alert(`Failed to add players: ${errorMessage}`);
-  }
-};
-
-
-// const handleEditPlayer = async (playerId) => {
-//   const player = players.find((p) => p._id === playerId);
-
-//   if (!player) {
-//     console.error("Player not found:", playerId);
-//     alert("Player not found.");
-//     return;
-//   }
-
-//   console.log("Editing player:", player);
-//   alert(`Editing player: ${player.name}`);
-
-//   setFormData({
-//     name: player.name || "",
-//     role: player.role || "",
-//     image: player.image || "",
-//     selectedPlayers: [playerId],
-//   });
-
-//   setShowModal(true);
-// };
+      setSelectedTeam(updatedTeam.data);
+      fetchTeams();
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.message;
+      console.error("Error adding players:", errorMessage);
+      alert(`Failed to add players: ${errorMessage}`);
+    }
+  };
 
   const filteredTeams = teams.filter((team) =>
     team.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">🏏 Teams</h1>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
+          🏏 Team Management
+        </h1>
 
-      <div className="text-center mb-6">
-        <input
-          type="text"
-          placeholder="Search teams..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 border rounded w-full max-w-md"
-        />
-      </div>
-
-      {(role === "team_owner" || role === "admin") && (
-        <div className="text-center mb-6">
-          <button
-            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
-            onClick={async () => {
-              await fetchPlayers();
-              setShowModal(true);
-            }}
-          >
-            ➕ Create Team
-          </button>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTeams.map((team) => (
-          <div key={team._id} className="bg-white shadow-md rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-indigo-600 mb-2">{team.name}</h2>
-            <p className="text-gray-700 mb-1">Coach: {team.coach || "Not Assigned"}</p>
-            <p className="text-gray-600 mb-4">Players: {team.players.length}</p>
-            <button
-              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
-              onClick={() => setSelectedTeam(team)}
+        {/* Search Bar */}
+        <div className="mb-8 flex justify-center">
+          <div className="relative w-full max-w-md">
+            <input
+              type="text"
+              placeholder="Search teams..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-5 py-3 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"
+            />
+            <svg
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              View Details
-            </button>
-            {(role === "admin" || team.createdBy === userId) && (
-              <button
-                className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-                onClick={() => handleDelete(team._id)}
-              >
-                Delete Team
-              </button>
-            )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 16.65z"
+              />
+            </svg>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* Create Team Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-xl">
-            <h2 className="text-2xl font-bold text-blue-700 mb-4">Create New Team</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                name="name"
-                placeholder="Team Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full border px-4 py-2 rounded"
-              />
-              <input
-                type="text"
-                name="coach"
-                placeholder="Coach Name"
-                value={formData.coach}
-                onChange={handleChange}
-                required
-                className="w-full border px-4 py-2 rounded"
-              />
-              {loadingPlayers ? (
-                <p className="text-sm text-gray-500">Loading players...</p>
-              ) : Array.isArray(players) && players.length > 0 ? (
-                <select
-                  multiple
-                  value={formData.selectedPlayers}
-                  onChange={handlePlayerSelect}
-                  className="w-full border px-4 py-2 rounded h-48"
+        {/* Create Team Button */}
+        {(role === "team_owner" || role === "admin") && (
+          <div className="text-center mb-10">
+            <button
+              className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 font-semibold text-lg"
+              onClick={async () => {
+                await fetchPlayers();
+                setShowModal(true);
+              }}
+            >
+              ➕ Create New Team
+            </button>
+          </div>
+        )}
+
+        {/* Teams Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTeams.length > 0 ? (
+            filteredTeams.map((team) => (
+              <div
+                key={team._id}
+                className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+              >
+                <h2 className="text-xl font-semibold text-indigo-600 mb-3">{team.name}</h2>
+                <p className="text-gray-600 mb-2">
+                  <span className="font-medium">Coach:</span> {team.coach || "Not Assigned"}
+                </p>
+                <p className="text-gray-600 mb-4">
+                  <span className="font-medium">Players:</span> {team.players.length}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    className="bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 transition-all duration-300 font-medium"
+                    onClick={() => setSelectedTeam(team)}
+                  >
+                    View Details
+                  </button>
+                  {(role === "admin" || team.createdBy === userId) && (
+                    <button
+                      className="bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600 transition-all duration-300 font-medium"
+                      onClick={() => handleDelete(team._id)}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center text-gray-500">
+              No teams found matching your search.
+            </div>
+          )}
+        </div>
+
+        {/* Create Team Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Create New Team</h2>
+                <button
+                  className="text-gray-400 hover:text-gray-600 text-xl font-bold transition-colors"
+                  onClick={() => setShowModal(false)}
                 >
-                  {players.map((player) => (
-                    <option key={player._id} value={player._id}>
-                      {player.name} — {player.role}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <p className="text-sm text-red-500">All players are already assigned to teams.</p>
-              )}
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-              >
-                Submit
-              </button>
-              <button
-                type="button"
-                className="ml-4 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
-                onClick={() => setShowModal(false)}
-              >
-                Cancel
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Add Players Modal */}
-      {addModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-xl">
-            <h2 className="text-2xl font-bold text-blue-700 mb-4">Add Players to Team</h2>
-            <form onSubmit={(e) => handleAddPlayers(e, selectedTeam._id)} className="space-y-4">
-              <select
-                multiple
-                value={formData.selectedPlayers}
-                onChange={handlePlayerSelect}
-                className="w-full border px-4 py-2 rounded h-48"
-              >
-                {players.map((player) => (
-                  <option key={player._id} value={player._id}>
-                    {player.name} — {player.role}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                
-              >
-                Add Players
-              </button>
-              <button
-                type="button"
-                className="ml-4 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
-                onClick={() => setAddModal(false)}
-              >
-                Cancel
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Team Details Modal */}
-      {selectedTeam && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg overflow-y-auto max-h-[90vh]">
-                        <h2 className="text-2xl font-bold text-blue-700 mb-4">{selectedTeam.name}</h2>
-            <p className="text-gray-700 mb-2">Coach: {selectedTeam.coach}</p>
-            <h3 className="text-lg font-semibold mb-2">Players:</h3>
-            <ul className="space-y-3">
-              {selectedTeam.players.map((player) => (
-                <li key={player._id} className="flex items-center gap-4">
-                  <img
-                    src={player.image}
-                    alt={player.name}
-                    className="w-12 h-12 rounded-full object-cover border"
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/48?text=No+Image";
-                    }}
+                  ✕
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Team Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter team name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                  <div>
-                    <p className="font-medium">{player.name}</p>
-                    <p className="text-sm text-gray-500">{player.role}</p>
-                  </div>
-      {(role === "admin" || selectedTeam.createdBy === userId) && (
-        <div className="ml-auto flex gap-2">
-
-          <button
-            title="Remove player from team"
-            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-            onClick={() => handleRemovePlayer(player._id)}
-          >
-            🗑️ Remove
-          </button>
-        </div>
-      )}
-
-                </li>
-              ))}
-            </ul>
-            <button
-              className="mt-6 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
-              onClick={() => setSelectedTeam(null)}
-            >
-              Close
-            </button>
-            {(role == 'admin' || selectedTeam.createdBy === userId) && (
-<button
-  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
-   onClick={async () => {
-              await fetchPlayers();
-              setAddModal(true);
-              setFormData((prev) => ({ ...prev, selectedPlayers: [] }));
-           }}
->
-  ➕ Add new Player 
-</button>
-            )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Coach Name
+                  </label>
+                  <input
+                    type="text"
+                    name="coach"
+                    placeholder="Enter coach name"
+                    value={formData.coach}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select Players (Max 20)
+                  </label>
+                  {loadingPlayers ? (
+                    <p className="text-sm text-gray-500">Loading players...</p>
+                  ) : Array.isArray(players) && players.length > 0 ? (
+                    <select
+                      multiple
+                      value={formData.selectedPlayers}
+                      onChange={handlePlayerSelect}
+                      className="w-full border border-gray-300 px-4 py-2 rounded-lg h-48 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {players.map((player) => (
+                        <option key={player._id} value={player._id}>
+                          {player.name} — {player.role}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="text-sm text-red-500">All players are already assigned to teams.</p>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all duration-300 font-medium"
+                  >
+                    Create Team
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-gray-300 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-400 transition-all duration-300 font-medium"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Add Players Modal */}
+        {addModal && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Add Players to {selectedTeam?.name}</h2>
+                <button
+                  className="text-gray-400 hover:text-gray-600 text-xl font-bold transition-colors"
+                  onClick={() => setAddModal(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              <form onSubmit={(e) => handleAddPlayers(e, selectedTeam._id)} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select Players
+                  </label>
+                  {loadingPlayers ? (
+                    <p className="text-sm text-gray-500">Loading players...</p>
+                  ) : Array.isArray(players) && players.length > 0 ? (
+                    <select
+                      multiple
+                      value={formData.selectedPlayers}
+                      onChange={handlePlayerSelect}
+                      className="w-full border border-gray-300 px-4 py-2 rounded-lg h-48 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {players.map((player) => (
+                        <option key={player._id} value={player._id}>
+                          {player.name} — {player.role}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="text-sm text-red-500">No available players to add.</p>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all duration-300 font-medium"
+                  >
+                    Add Players
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-gray-300 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-400 transition-all duration-300 font-medium"
+                    onClick={() => setAddModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Team Details Modal */}
+        {selectedTeam && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">{selectedTeam.name}</h2>
+                <button
+                  className="text-gray-400 hover:text-gray-600 text-xl font-bold transition-colors"
+                  onClick={() => setSelectedTeam(null)}
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="text-gray-600 mb-3">
+                <span className="font-medium">Coach:</span> {selectedTeam.coach}
+              </p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Players</h3>
+              <ul className="space-y-4">
+                {selectedTeam.players.length > 0 ? (
+                  selectedTeam.players.map((player) => (
+                    <li key={player._id} className="flex items-center gap-4 bg-gray-50 p-3 rounded-lg">
+                      <img
+                        src={player.image}
+                        alt={player.name}
+                        className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                        onError={(e) => {
+                          e.target.src = "https://via.placeholder.com/48?text=No+Image";
+                        }}
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-800">{player.name}</p>
+                        <p className="text-sm text-gray-500">{player.role}</p>
+                      </div>
+                      {(role === "admin" || selectedTeam.createdBy === userId) && (
+                        <button
+                          title="Remove player from team"
+                          className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 transition-all duration-300"
+                          onClick={() => handleRemovePlayer(player._id)}
+                        >
+                          🗑️
+                        </button>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No players assigned to this team.</p>
+                )}
+              </ul>
+              <div className="mt-6 flex gap-3">
+                {(role === "admin" || selectedTeam.createdBy === userId) && (
+                  <button
+                    className="bg-green-500 text-white px-5 py-2 rounded-full hover:bg-green-600 transition-all duration-300 font-medium"
+                    onClick={async () => {
+                      await fetchPlayers();
+                      setAddModal(true);
+                      setFormData((prev) => ({ ...prev, selectedPlayers: [] }));
+                    }}
+                  >
+                    ➕ Add Players
+                  </button>
+                )}
+                <button
+                  className="bg-gray-300 text-gray-800 px-5 py-2 rounded-full hover:bg-gray-400 transition-all duration-300 font-medium"
+                  onClick={() => setSelectedTeam(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
