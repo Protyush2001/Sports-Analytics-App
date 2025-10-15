@@ -35,6 +35,9 @@ const matchStreamRoutes = require('./app/routes/matchStreamRoutes');
 const adminRoutes = require('./app/routes/adminRoutes');
 const payment = require('./app/routes/payment');
 const registerChatbotHandlers = require("./app/chatbot/chatbotSocket");
+// In your main server file (app.js or server.js)
+const predictionRoutes = require('./app/routes/prediction');
+
 
 // ADD NEW RECORDING ROUTES IMPORT
 // const recordingRoutes = require('./app/routes/recordingRoutes');
@@ -89,6 +92,7 @@ app.post('/login',userController.login);
 app.post('/matches',authenticateUser, customMatchController.createMatches);
 app.get('/getAllMatches',customMatchController.getAllMatches)
 app.patch('/matches/:id/ball',customMatchController.updateBall);
+app.use('/api/predictions', predictionRoutes);
 
 // ADD NEW RECORDING STATUS ROUTE
 app.patch('/matches/:matchId/recording-status', authenticateUser, customMatchController.updateRecordingStatus);

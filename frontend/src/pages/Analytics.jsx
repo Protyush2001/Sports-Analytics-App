@@ -1274,6 +1274,7 @@ import BestPlaying11 from "../components/AnalyticsFolder/BestPlaying11";
 import PerformanceInsights from "../components/AnalyticsFolder/PerformanceInsights";
 import TeamComposition from "../components/AnalyticsFolder/TeamComposition";
 import QuickStats from "../components/AnalyticsFolder/QuickStats";
+import MatchPerformance from "../components/AnalyticsFolder/MatchPerformance";
 
 const API_BASE = "http://localhost:3026/api/players";
 
@@ -1289,6 +1290,7 @@ const Analytics = () => {
   const [playerB, setPlayerB] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [isGeneratingTeam, setIsGeneratingTeam] = useState(false);
+    const [selectedPlayer, setSelectedPlayer] = useState("");
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -1425,9 +1427,19 @@ const Analytics = () => {
           playerStats={playerStats}
           filteredStats={filteredStats}
           expertise={expertise}
+           selectedPlayer={selectedPlayer} // ADD THIS
+          setSelectedPlayer={setSelectedPlayer} // ADD THIS
         />
 
         <StatsCards filteredStats={filteredStats} />
+
+                {/* ADD MATCH PERFORMANCE SECTION */}
+        <div className="mt-8">
+          <MatchPerformance 
+            playerId={selectedPlayer}
+            playerName={playerStats.find(p => p._id === selectedPlayer)?.name}
+          />
+        </div>
 
         <Charts
           playerStats={playerStats}

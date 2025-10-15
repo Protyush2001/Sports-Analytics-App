@@ -71,7 +71,13 @@ const commentarySchema = new mongoose.Schema({
 const predictionSchema = new mongoose.Schema({
   type: { type: String, enum: ['player', 'match', 'momentum'], required: true },
   prediction: { type: String, required: true },
-  confidence: { type: Number, min: 0, max: 100 },
+  // confidence: { type: Number, min: 0, max: 100 },
+  confidence: {
+  type: String,
+  enum: ['High', 'Medium', 'Low'],
+  required: true
+},
+
   timestamp: { type: Date, default: Date.now },
   playerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Player' },
   winProbability: {

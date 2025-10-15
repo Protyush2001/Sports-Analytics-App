@@ -13,7 +13,9 @@ const Filters = ({
   teams,
   playerStats,
   filteredStats,
-  expertise
+  expertise,
+  selectedPlayer, // ADD
+  setSelectedPlayer // ADD
 }) => {
   const filteredPlayerA = filteredStats.filter((player) => player._id !== playerB);
   const filteredPlayerB = filteredStats.filter((player) => player._id !== playerA);
@@ -89,6 +91,24 @@ const Filters = ({
             </select>
           </div>
         )}
+        {/* ADD PLAYER SELECTION FOR MATCH PERFORMANCE */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            View Player Match Performance
+          </label>
+          <select
+            value={selectedPlayer}
+            onChange={(e) => setSelectedPlayer(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Select a player</option>
+            {playerStats.map((player) => (
+              <option key={player._id} value={player._id}>
+                {player.name} ({player.role})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );

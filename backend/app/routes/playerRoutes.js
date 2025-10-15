@@ -1,90 +1,4 @@
-// const express = require('express');
-// const router = express.Router();
-// const Player = require('../models/player-model');
-// const authenticateUser = require('../middlewares/authenticateUser');
-// const authorizeRoles = require('../middlewares/checkRole');
 
-// // ✅ Get all players
-// router.get('/', authenticateUser, authorizeRoles("player", "team_owner", "admin"), async (req, res) => {
-//   try {
-//     const players = await Player.find();
-//     res.json(players);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// /// x /////
-
-// // ✅ Create player
-// // router.post('/', authenticateUser, authorizeRoles("admin", "team_owner","player"), async (req, res) => {
-// //   try {
-// //     const newPlayer = new Player(req.body);
-// //     await newPlayer.save();
-// //     res.status(201).json(newPlayer);
-// //   } catch (err) {
-// //     res.status(400).json({ error: err.message });
-// //   }
-// // });
-// //x///
-
-// router.post('/', authenticateUser, authorizeRoles("admin", "team_owner", "player"), async (req, res) => {
-//   try {
-//     const newPlayer = new Player({
-//       ...req.body,
-//       userId: req.user._id // ✅ Attach logged-in user's ID
-//     });
-
-//     await newPlayer.save();
-//     res.status(201).json(newPlayer);
-//   } catch (err) {
-//     res.status(400).json({ error: err.message });
-//   }
-// });
-
-// // x////
-// // ✅ Update player
-// // router.put('/:id', authenticateUser, authorizeRoles("admin", "team_owner","player"), async (req, res) => {
-// //   try {
-// //     const updatedPlayer = await Player.findByIdAndUpdate(req.params.id, req.body, { new: true });
-// //     res.json(updatedPlayer);
-// //   } catch (err) {
-// //     res.status(400).json({ error: err.message });
-// //   }
-// // });
-// ////x////
-
-// router.put('/:id', authenticateUser, authorizeRoles("admin", "team_owner", "player"), async (req, res) => {
-//   try {
-//     const player = await Player.findById(req.params.id);
-
-//     if (!player) {
-//       return res.status(404).json({ error: "Player not found" });
-//     }
-
-//     // ✅ Optional: Ensure player belongs to the logged-in user if they are a player
-//     if (req.user.role === "player" && player.userId !== req.user._id) {
-//       return res.status(403).json({ error: "Not authorized to update this player" });
-//     }
-
-//     const updatedPlayer = await Player.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     res.json(updatedPlayer);
-//   } catch (err) {
-//     res.status(400).json({ error: err.message });
-//   }
-// });
-
-// // ✅ Delete player
-// router.delete('/:id', authenticateUser, authorizeRoles("admin"), async (req, res) => {
-//   try {
-//     await Player.findByIdAndDelete(req.params.id);
-//     res.json({ message: 'Player deleted successfully' });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// module.exports = router;
 
 
 const express = require("express");
@@ -93,6 +7,7 @@ require('dotenv').config();
 const multer = require('multer');
 const path = require('path');
 const Player = require('../models/player-model');
+const Match = require('../models/match-model');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const authenticateUser = require('../middlewares/authenticateUser');
 
@@ -193,6 +108,50 @@ router.get("/players/unassigned", authenticateUser, async (req, res) => {
     res.status(200).json(unassignedPlayers);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+////////////////////////////////
+// Add to your player routes
+router.get('/:playerId/match-performance', async (req, res) => {
+  try {
+    const { playerId } = req.params;
+    
+    // This depends on your database structure
+    // You'll need to query matches where this player participated
+    const matchPerformances = await Match.find({
+      $or: [
+        { 'players.playerId': playerId },
+        { 'commentary.batsman.id': playerId },
+        { 'commentary.bowler.id': playerId }
+      ]
+    })
+    .populate('teams')
+    .sort({ date: -1 })
+    .limit(20);
+
+    // Transform the data to extract player-specific performance
+    const performances = matchPerformances.map(match => {
+      // Extract player's batting, bowling, and fielding stats from the match
+      // This logic depends on your match data structure
+      const playerPerformance = {
+        matchId: match._id,
+        matchTitle: match.title,
+        matchDate: match.date,
+        opponent: match.teams.find(team => 
+          !team.players.some(p => p.playerId?.toString() === playerId)
+        )?.name || 'Opponent',
+        result: match.result,
+        // Add batting, bowling, fielding stats based on your data structure
+      };
+      
+      return playerPerformance;
+    });
+
+    res.json(performances);
+  } catch (error) {
+    console.error('Error fetching match performances:', error);
+    res.status(500).json({ error: 'Failed to fetch match performances' });
   }
 });
 
